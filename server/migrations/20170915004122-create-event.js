@@ -8,13 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      eventTitle: {
+      event_title: {
         type: Sequelize.STRING
       },
       location: {
         type: Sequelize.STRING
       },
-      availableSlots: {
+      available_slots: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
@@ -22,11 +22,11 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE
       }
