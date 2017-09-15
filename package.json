@@ -4,15 +4,21 @@
   "description": "this is an api for the event app",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon ./bin/www",
     "test": "run test"
   },
   "author": "samuel gaamuwa",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.1",
     "eslint": "^4.6.1",
     "express": "^4.15.4",
+    "morgan": "^1.8.2",
     "pg": "^7.3.0",
     "pg-hstore": "^2.3.2",
     "sequelize": "^4.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
   }
 }
