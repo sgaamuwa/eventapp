@@ -1,31 +1,30 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  var User = sequelize.define('User', {
+  var event = sequelize.define('event', {
     id: {
       type: DataTypes.STRING,
       primaryKey: true,
-      unique: true,
-    },
-    firstName: {
-      type: DataTypes.STRING,
-      field: "first_name",
-      allowNull: false
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      field: "last_name",
-      allowNull: false,
-    },
-    userName: {
-      type: DataTypes.STRING,
-      field: "user_name", 
-      allowNull: false,
       unique: true
     },
-    password: {
+    eventTitle: {
       type: DataTypes.STRING,
-      field: "password",
+      field: "event_title",
       allowNull: false
+    },
+    location: {
+      type: DataTypes.STRING,
+      field: "location",
+      allowNull: false
+    },
+    availableSlots: {
+      type: DataTypes.INTEGER,
+      field: "available_slots",
+      allowNull: false,
+      defaultValue: 2
+    },
+    eventDate: {
+      type: DataTypes.DATE,
+      field: 'event_date'
     },
     updatedAt: {
       type: DataTypes.DATE,
@@ -35,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       field: 'created_at',
     }
+    
   }, {
     classMethods: {
       associate: function(models) {
@@ -42,5 +42,5 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
   });
-  return User;
+  return event;
 };
