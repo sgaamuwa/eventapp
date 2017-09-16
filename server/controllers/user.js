@@ -1,8 +1,9 @@
 const User = require('../models').User;
+const passwordHash = require('password-hash');
 
 createUser = function(req, res){
     // check that no other user with that username exists and then set up that user
-    User.findAll({
+    return User.findAll({
         where: {
             userName: req.body.userName
         }
@@ -15,7 +16,8 @@ createUser = function(req, res){
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 userName: req.body.userName,
-                password: req.body.password
+                //hash the password
+                password: passwordHash.generate(req.body.password)
             }).then(user => res.status(201).send(user))
             .catch(error => res.status(400).send(error));
         }
@@ -23,7 +25,13 @@ createUser = function(req, res){
 };
 
 getUser = function(req, res){
-    res.status(200).send('This was a success');
+    return User.findOne({
+        where: {
+            id: 1
+        }
+    }).then((user) => {
+        res.status(200).send(user);
+    }).catch(error => res.status(400).send(error));
 };
 
 module.exports = {
