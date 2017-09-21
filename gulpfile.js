@@ -28,5 +28,11 @@ gulp.task('test', ['migrate'], function(){
     gulp.src(['./tests/controllers/*.js', './tests/models/*.js'])
         .pipe(mocha({
             reporter: 'spec'
-        }));
+        }))
+        .once('error', function(){
+            process.exit(1);
+        })
+        .once('end', function(){
+            process.exit();
+        });
 });
