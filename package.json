@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./bin/www",
-    "test": "run test"
+    "test": "export NODE_ENV=test && gulp test"
   },
   "author": "samuel gaamuwa",
   "license": "ISC",
@@ -17,11 +17,16 @@
     "password-hash": "^1.2.2",
     "pg": "^7.3.0",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^4.8.3"
+    "sequelize": "^4.8.4"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "gulp": "^3.9.1",
+    "gulp-exit": "0.0.2",
+    "gulp-istanbul": "^1.1.2",
+    "gulp-mocha": "^4.3.1",
     "gulp-nodemon": "^2.2.1",
+    "gulp-shell": "^0.6.3",
     "nodemon": "^1.12.1"
   }
 }
