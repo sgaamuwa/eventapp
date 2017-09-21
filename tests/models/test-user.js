@@ -40,7 +40,6 @@ describe("User Model Tests", function(){
         });
     });
     afterEach(function(done){
-        console.log('runing from here')
         User.destroy({ where: {}}).then(() => {
             done();
         });
@@ -73,15 +72,54 @@ describe("User Model Tests", function(){
         });
     });
         
-    it("should update the user if the id is exists", function(){
-
+    it("should update the user if the id is exists", function(done){
+        User.bulkCreate(mockUsers).then((users) => {
+            User.update(
+                { firstName: "Brian"},
+                { where: {
+                    id: 4
+                }}
+            ).then(() => {
+                User.findOne({
+                    where: {
+                        id: 4
+                    }
+                }).then((user) => {
+                    expect(users[3].firstName).to.equal('Kimani');
+                    expect(users[3].lastName).to.equal('Ndegwa');
+                    expect(user.firstName).to.equal('Brian');
+                    expect(user.lastName).to.equal('Ndegwa');
+                    done();
+                });
+            });
+        });
     });
 
-    it("should find a particular user", function(){
-
+    it("should find a particular user", function(done){
+        User.bulkCreate(mockUsers).then(() => {
+            User.findOne({
+                where:{
+                    id: 3
+                }
+            }).then((user) => {
+                expect(user.userName).to.equal('rwachira');
+                expect(user.firstName).to.equal('Rehema');
+                expect(user.lastName).to.equal('Wachira');
+                done();
+            });
+        });
     });
 
-    it("should find all users", function(){
-
+    it("should find all users", function(done){
+        User.bulkCreate(mockUsers).then(() => {
+            User.findAll().then((users) => {
+                expect(users).to.have.lengthOf(4);
+                expect(users[0].userName).to.equal('sgaamuwa');
+                expect(users[1].userName).to.equal('aokoth');
+                expect(users[2].userName).to.equal('rwachira');
+                expect(users[3].userName).to.equal('kndegwa');
+                done();
+            });
+        });
     });
 });
