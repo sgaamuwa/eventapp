@@ -25,7 +25,7 @@ gulp.task('migrate', shell.task([
 
 // task to run tests
 gulp.task('test', ['migrate'], function(){
-    gulp.src(['./tests/controllers/*.js', './tests/models/*.js'])
+    gulp.src(['./tests/routes/*.js', './tests/models/*.js'])
         .pipe(mocha({
             reporter: 'spec'
         }))

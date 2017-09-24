@@ -1,11 +1,14 @@
 const expect = require('chai').expect;
-const
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../../server/routes');
 const User = require('../../server/models').User;
 const userController = require('../../server/controllers').user;
 
-
 let userInput;
 let request = {};
+
+chai.use(chaiHttp);
 
 describe('User Controller Tests', function(){
     before(function(done){
@@ -36,7 +39,9 @@ describe('User Controller Tests', function(){
                 password: "pass123"
             }
         ]
-        done();
+        User.destroy({ where: {} }).then(function(){
+            done();
+        });
     });
     afterEach(function(done){
         User.destroy({ where: {} }).then(function(){
@@ -44,12 +49,13 @@ describe('User Controller Tests', function(){
         });
     });
 
-    it('should create a user if all parameters are valid', function(){
-        request.body = userInput[0];
-        return userController.createUser(request, {}).then(function(response){
-            console.log('response>>>>>>', response);
-            expect(response.status).to.equal(200);
-        });
+    it('should create a user if all parameters are valid', function(done){
+        chai.request(server)
+            .post('/api/users')
+            .end(function(err, res){
+                expect(res).to.have.status(200);
+                done();
+            });
     });
 
     it('should return an error if user information for creation is incomplete', function(){
