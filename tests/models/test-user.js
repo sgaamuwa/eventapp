@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const User = require('../../server/models').User
+const User = require('../../server/models').User;
 
 let mockUsers;
 

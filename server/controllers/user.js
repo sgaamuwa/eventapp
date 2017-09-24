@@ -3,6 +3,7 @@ const passwordHash = require('password-hash');
 
 createUser = function(req, res){
     // check that no other user with that username exists and then set up that user
+    console.log(res);
     return User.findAll({
         where: {
             userName: req.body.userName
