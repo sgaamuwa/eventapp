@@ -20,12 +20,12 @@ gulp.task('start', function(){
 });
 // run all migrations 
 gulp.task('migrate', shell.task([
-    'sequelize db:migrate',
+    'export NODE_ENV=test && sequelize db:migrate',
 ]));
 
 // task to run tests
 gulp.task('test', ['migrate'], function(){
-    gulp.src(['./tests/controllers/*.js', './tests/models/*.js'])
+    gulp.src(['./tests/routes/*.js', './tests/models/*.js'])
         .pipe(mocha({
             reporter: 'spec'
         }))
