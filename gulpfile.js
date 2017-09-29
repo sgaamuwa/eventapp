@@ -20,7 +20,7 @@ gulp.task('start', function(){
 });
 // run all migrations 
 gulp.task('migrate', shell.task([
-    'sequelize db:migrate',
+    'export NODE_ENV=test && sequelize db:migrate',
 ]));
 
 // task to run tests
