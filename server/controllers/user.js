@@ -1,5 +1,34 @@
 const User = require('../models').User;
+const jwt = require('jsonwebtoken');
 const passwordHash = require('password-hash');
+
+authenticate = function(req, res){
+    return User.findOne({
+        where: {
+            userName: req.body.userName
+        }
+    }).then(function(user){
+        if(user){
+            if(passwordHash.verify(req.body.password, user.password)){
+                let token = jwt.sign({data: user}, 'kinggaamuwasamuel', {
+                    expiresIn: 1440
+                });
+                res.status(200).json({
+                    success: true,
+                    message: 'JWT Token',
+                    token: token
+                });
+            }
+            else{
+                res.status(400).send('Invalid password, authentication failed');
+            }
+        }else{
+            res.status(400).send('User not found, authentication failed');
+        }
+    }).catch(function(err){
+        res.status(500).send(err);
+    });
+};
 
 createUser = function(req, res){
     // check that no other user with that username exists and then set up that user
@@ -35,6 +64,7 @@ getUser = function(req, res){
 };
 
 module.exports = {
+    authenticate,
     createUser,
     getUser
 }

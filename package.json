@@ -13,6 +13,7 @@
     "body-parser": "^1.18.1",
     "eslint": "^4.6.1",
     "express": "^4.15.4",
+    "jsonwebtoken": "^8.0.1",
     "morgan": "^1.8.2",
     "password-hash": "^1.2.2",
     "pg": "^7.3.0",
