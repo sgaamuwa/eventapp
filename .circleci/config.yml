@@ -41,9 +41,9 @@ jobs:
 
       # install sequelize globally    
       - run:
-          name: Update npm
-          command: 'sudo npm install -g sequelize'
-          
+          name: Install sequelize 
+          command: 'sudo npm install -g sequelize-cli'
+
       # run tests!
       - run: 
           name: Run Tests
