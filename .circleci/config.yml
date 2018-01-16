@@ -39,9 +39,11 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # database setup
-      - run: bundle exec rake db:create
-        
+      # install sequelize globally    
+      - run:
+          name: Update npm
+          command: 'sudo npm install -g sequelize'
+          
       # run tests!
       - run: 
           name: Run Tests
