@@ -1,14 +1,17 @@
 const User = require('../models').User;
 const jwt = require('jsonwebtoken');
 const passwordHash = require('password-hash');
+const _ = require('lodash');
 
 authenticate = function(req, res){
+    // look for the user in the database
     return User.findOne({
         where: {
             userName: req.body.userName
         }
     }).then(function(user){
         if(user){
+            // verify that the password matches the hashed password in the database
             if(passwordHash.verify(req.body.password, user.password)){
                 let token = jwt.sign({data: user}, 'kinggaamuwasamuel', {
                     expiresIn: 1440
@@ -20,12 +23,15 @@ authenticate = function(req, res){
                 });
             }
             else{
+                // send a 400 if the password does not match
                 res.status(400).send('Invalid password, authentication failed');
             }
         }else{
+            // send a 400 if the user is not in the database
             res.status(400).send('User not found, authentication failed');
         }
     }).catch(function(err){
+        // send a 500 if there is a system error
         res.status(500).send(err);
     });
 };
@@ -59,7 +65,8 @@ getUser = function(req, res){
             id: 1
         }
     }).then((user) => {
-        res.status(200).send(user);
+
+        res.status(200).send(_.omit(user, "password"));
     }).catch(error => res.status(400).send(error));
 };
 
