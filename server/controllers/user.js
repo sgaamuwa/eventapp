@@ -47,14 +47,14 @@ createUser = function(req, res){
             res.status(400).send('A user with that username already exists')
         }else{
             User.create({
-                id: 1,
+                id: req.body.id,
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 userName: req.body.userName,
                 //hash the password
                 password: passwordHash.generate(req.body.password)
             }).then(user => res.status(201).send(user))
-            .catch(error => res.status(400).send(error));
+            .catch(error => res.status(400).send({error}));
         }
     }) 
 };
@@ -62,16 +62,39 @@ createUser = function(req, res){
 getUser = function(req, res){
     return User.findOne({
         where: {
-            id: 1
+            id: req.params.id
         }
     }).then((user) => {
+        res.status(200).send(user);
+    }).catch(error => res.status(404).send(error));
+};
 
-        res.status(200).send(_.omit(user, "password"));
-    }).catch(error => res.status(400).send(error));
+getUsers = function(req, res){
+    return User.findAll().then(function(users){
+        res.status(200).send(users);
+    });
+}
+
+updateUser = function(req, res){
+    return User.findOne({
+        where: {
+            id: req.params.id
+        }
+    }).then(function(user){
+        user.update(req.body).then(function(updatedUser){
+            res.status(200).send(updatedUser);
+        }).catch(function(err){
+            res.status(400).send('Bad request');
+        });
+    }).catch(function(err){
+        res.status(404).send('Do better');
+    });
 };
 
 module.exports = {
     authenticate,
+    updateUser,
     createUser,
-    getUser
+    getUsers,
+    getUser,
 }
