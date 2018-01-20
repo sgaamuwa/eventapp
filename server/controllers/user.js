@@ -65,7 +65,7 @@ getUser = function(req, res){
             id: req.params.id
         }
     }).then((user) => {
-        res.status(200).send(user);
+        user ? res.status(200).send(user) : res.status(404).send('Resource not available');
     }).catch(error => res.status(404).send(error));
 };
 
@@ -81,6 +81,9 @@ updateUser = function(req, res){
             id: req.params.id
         }
     }).then(function(user){
+        if(!req.body){
+            return res.status(400).send('need more');
+        }
         user.update(req.body).then(function(updatedUser){
             res.status(200).send(updatedUser);
         }).catch(function(err){
@@ -91,10 +94,23 @@ updateUser = function(req, res){
     });
 };
 
+deleteUser = function(req, res){
+    return User.destroy({
+        where: {
+            id: req.params.id
+        }
+    }).then(function(user){
+        user ? res.status(204).send('User deleted') : res.status(404).send('Resource does not exist');
+    }).catch(function(err){
+        res.status(400).send('Bad Request');
+    });
+}
+
 module.exports = {
     authenticate,
     updateUser,
     createUser,
+    deleteUser,
     getUsers,
     getUser,
 }

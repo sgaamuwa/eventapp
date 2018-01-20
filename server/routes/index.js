@@ -9,4 +9,5 @@ module.exports = (app) => {
     app.get('/api/users', userController.getUsers);
     app.get('/api/user/:id', userController.getUser);
     app.patch('/api/user/:id', userController.updateUser);
+    app.delete('/api/user/:id', userController.deleteUser);
 }

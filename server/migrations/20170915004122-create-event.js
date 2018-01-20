@@ -18,9 +18,12 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      eventDate: {
+      event_date: {
         type: Sequelize.DATE,
         allowNull: false
+      },
+      event_link: {
+        type: Sequelize.STRING,
       },
       created_at: {
         allowNull: false,
