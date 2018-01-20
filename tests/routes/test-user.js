@@ -168,8 +168,7 @@ describe('User Controller Tests', function(){
             .get('/api/user/20002')
             .set({'JWT-Token': token})
             .end(function(error, response){
-                // ensure that the same user can't be created twice
-                expect(response).to.have.status(401);
+                expect(response).to.have.status(404);
                 done();
             });
     });
@@ -188,9 +187,8 @@ describe('User Controller Tests', function(){
     });
 
     it('should not update if there is no information passed', function(done){
-        
         chai.request(server)
-            .patch('/api/user/'+testUserId)
+            .patch('/api/user/5')
             .set({'JWT-Token': token})
             .send({})
             .end(function(error, response){
@@ -202,12 +200,25 @@ describe('User Controller Tests', function(){
 
     it('should not update if the user does not exist', function(done){
         chai.request(server)
-        .patch('/api/user/2345323')
-        .set({'JWT-Token': token})
-        .send({userName : "gsamuel"})
-        .end(function(error, response){
-            expect(response).to.have.status(404);
-        });
+            .patch('/api/user/2345323')
+            .set({'JWT-Token': token})
+            .send({userName : "gsamuel"})
+            .end(function(error, response){
+                expect(response).to.have.status(404);
+                done();
+            });
+    });
+
+    it.only('should raise an error if the update information is wrong', function(done){
+        chai.request(server)
+            .patch('/api/user/5')
+            .set({'JWT-Token': token})
+            .send({news: "test"})
+            .end(function(error, response){
+                console.log('the thing >>>>>>>',response);
+                expect(response).to.have.status(400);
+                done();
+            });
     });
 
     it('should delete a user if they exist', function(done){
@@ -216,14 +227,14 @@ describe('User Controller Tests', function(){
             .set({'JWT-Token': token})
             .end(function(error, response){
                 // ensure that the same user can't be created twice
-                expect(response).to.have.status(200);
+                expect(response).to.have.status(204);
                 done();
             });
     });
 
     it('should return if deleted user does not exist', function(done){
         chai.request(server)
-            .del('/api/user/1')
+            .del('/api/user/2345323')
             .set({'JWT-Token': token})
             .end(function(error, response){
                 // ensure that the same user can't be created twice
