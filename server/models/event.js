@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       field: 'event_date'
     },
+    eventLink: {
+      type: DataTypes.STRING,
+      field: 'event_link'
+    },
     updatedAt: {
       type: DataTypes.DATE,
       field: 'updated_at',
