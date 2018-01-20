@@ -108,6 +108,7 @@ describe('User Controller Tests', function(){
         });
     });
 
+    // POST tests
     it('should create a user if all parameters are valid', function(done){
         chai.request(server)
             .post('/register')
@@ -141,6 +142,7 @@ describe('User Controller Tests', function(){
         done();
     });
 
+    // GET tests
     it('should get all users', function(done){
         chai.request(server)
             .get('/api/users')
@@ -173,6 +175,7 @@ describe('User Controller Tests', function(){
             });
     });
 
+    // PATCH tests
     it('should update a user if they exist', function(done){
         chai.request(server)
             .patch('/api/user/1')
@@ -209,7 +212,7 @@ describe('User Controller Tests', function(){
             });
     });
 
-    it.only('should raise an error if the update information is wrong', function(done){
+    it('should raise an error if the update information is wrong', function(done){
         chai.request(server)
             .patch('/api/user/5')
             .set({'JWT-Token': token})
@@ -221,6 +224,7 @@ describe('User Controller Tests', function(){
             });
     });
 
+    // DELETE tests
     it('should delete a user if they exist', function(done){
         chai.request(server)
             .del('/api/user/2')
@@ -232,7 +236,25 @@ describe('User Controller Tests', function(){
             });
     });
 
-    it('should return if deleted user does not exist', function(done){
+    it('should return error if the user was deleted', function(done){
+        chai.request(server)
+            .del('/api/user/3')
+            .set({'JWT-Token': token})
+            .end(function(error, response){
+                // ensure that the same user can't be created twice
+                expect(response).to.have.status(204);
+                chai.request(server)
+                    .del('/api/user/3')
+                    .set({'JWT-Token': token})
+                    .end(function(error, response){
+                        // ensure that the same user can't be created twice
+                        expect(response).to.have.status(404);
+                        done();
+                    });
+            });
+    });
+
+    it('should return error if deleted user does not exist', function(done){
         chai.request(server)
             .del('/api/user/2345323')
             .set({'JWT-Token': token})
