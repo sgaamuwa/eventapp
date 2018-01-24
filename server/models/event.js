@@ -1,4 +1,6 @@
 'use strict';
+const User = ('./user').User;
+
 module.exports = (sequelize, DataTypes) => {
   var event = sequelize.define('event', {
     id: {
@@ -43,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate: function(models) {
         // associations can be defined here
+        event.belongsTo(models.User);
       }
     }
   });
