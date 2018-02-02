@@ -4,9 +4,8 @@ module.exports = {
     return queryInterface.createTable('events', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       event_title: {
         type: Sequelize.STRING
@@ -24,6 +23,15 @@ module.exports = {
       },
       event_link: {
         type: Sequelize.STRING,
+      },
+      user_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       created_at: {
         allowNull: false,

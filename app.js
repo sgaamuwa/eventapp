@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const apiRoutes = require('./server/controllers').middleware.apiRoutes;
@@ -11,6 +12,17 @@ app.use(logger('dev'));
 
 // set up the app to use jwtToken
 app.use('/api', apiRoutes);
+
+// set up the app to use sessions
+app.use(session({
+  secret: 'kinggaamuwasamuel',
+  name: 'id',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    expires: 100000000
+  }
+}));
 
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());

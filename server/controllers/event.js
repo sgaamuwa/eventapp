@@ -1,9 +1,16 @@
-const Event = require('../models').Event;
+const Event = require('../models').event;
+const User = require('../models').User;
 
 createEvent = function(req, res){
-    return Event.create(req.body).then(function(event){
-        res.status(201).send(event);
-    })
+    // check if there is a user
+    let event = req.body;
+    event.id = Math.floor(Math.random() * 50000);
+    event.userId = 1;
+    return Event.create(event).then(function(event1){
+        res.status(201).send(event1);
+    }).catch(function(error){
+        console.log('This is the error>>', error);
+    });
 }
 
 module.exports = {
