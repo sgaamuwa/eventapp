@@ -24,6 +24,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 2
     },
+    userId: {
+      type: DataTypes.STRING,
+      field: "user_id",
+      references: User, 
+      referencesKey: "id"
+    },
     eventDate: {
       type: DataTypes.DATE,
       field: 'event_date'
@@ -45,7 +51,9 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate: function(models) {
         // associations can be defined here
-        event.belongsTo(models.User);
+        event.belongsTo(User, {
+          foreignKey: 'userId'
+        });
       }
     }
   });
