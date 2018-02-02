@@ -16,6 +16,8 @@ authenticate = function(req, res){
                 let token = jwt.sign({data: user}, 'kinggaamuwasamuel', {
                     expiresIn: 1440
                 });
+                req.session.user = user;
+                req.session.token = token;
                 res.status(200).json({
                     success: true,
                     message: 'JWT Token',
