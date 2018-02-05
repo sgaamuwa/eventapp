@@ -8,17 +8,43 @@ const eventPayloads = require('../test_helpers/event-payloads');
 
 chai.use(chaiHttp);
 
-describe.only('Event controller tests', function(){
+let token;
+let authorisedUser = chai.request.agent(server);
+
+describe('Event controller tests', function(){
 
     before(function(done){
+        // create a user and get a session back
+        chai.request(server)
+            .post('/register')
+            .send({
+                id: "5",
+                userName: "test",
+                firstName: "Test FirstName",
+                lastName: "Test LastName",
+                password: "pass123"
+            })
+            .end(function(err, res){
+                authorisedUser
+                    .post('/login')
+                    .send({
+                        userName: "test",
+                        password: "pass123"
+                    })
+                    .end(function(err, res){
+                        token = res.body.token;
+                        // get cookie from response
+                        Events.destroy({ where: {} })
+                              .then(function(){
+                                  Events.bulkCreate(eventPayloads.getBulkCreate())
+                                        .then(function(){
+                                            done();
+                                        });
+                              });
+                    });
+            });
         // add events to the database for the tests
-        Events.destroy({ where: {} })
-             .then(function(){
-                Events.bulkCreate(eventPayloads.getBulkCreate())
-                .then(function(){
-                    done();
-                });
-             });
+        
     });
 
     after(function(done){
@@ -31,10 +57,12 @@ describe.only('Event controller tests', function(){
 
     // POST tests
     it('should create an event when all the information is given', function(done){
-        chai.request(server)
-            .post('/events')
+        authorisedUser
+            .post('/api/events')
+            .set({'JWT-Token': token})
             .send(eventPayloads.getValidPostEvent())
             .end(function(err, res){
+                console.log('error>>>>',res.body);
                 expect(res).to.have.status(201);
                 done();
             });
