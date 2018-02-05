@@ -11,7 +11,7 @@ apiRoutes.use(function(req, res, next){
         // verify the token using the secretkey
         jwt.verify(token, 'kinggaamuwasamuel', function(err, decoded){
             if(err){
-                return res.json({ success: false, message: 'Failed to authenticate token'});
+                return res.status(401).json({ success: false, message: 'Failed to authenticate token'});
             } else {
                 req.decoded = decoded;
                 next();
