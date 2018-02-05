@@ -45,7 +45,9 @@ createUser = function(req, res){
             userName: req.body.userName
         }
     }).then((users) => {
-        if(users.length > 0){
+        if(_.isEmpty(req.body)){
+            return res.status(400).send('need more');
+        }else if(users.length > 0){
             res.status(400).send('A user with that username already exists')
         }else{
             User.create({
@@ -83,7 +85,7 @@ updateUser = function(req, res){
             id: req.params.id
         }
     }).then(function(user){
-        if(!req.body){
+        if(_.isEmpty(req.body)){
             return res.status(400).send('need more');
         }
         user.update(req.body).then(function(updatedUser){
