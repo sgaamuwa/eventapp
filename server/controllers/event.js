@@ -3,13 +3,13 @@ const User = require('../models').User;
 
 createEvent = function(req, res){
     // check if there is a user
-    if(res.session.user){
+    if(req.session.user){
         let event = req.body;
         // check that the user exists
         return User.findOne({
             where:{
-                id: res.session.user.id,
-                userName: res.session.user.userName
+                id: req.session.user.id,
+                userName: req.session.user.userName
             }
         }).then(function(user){
             if(user){
@@ -29,10 +29,10 @@ createEvent = function(req, res){
 }
 
 getAllEvents = function(req, res){
-    if(res.session.user){
+    if(req.session.user){
         return Event.findAll({
             where:{
-                userId: res.session.user.id
+                userId: req.session.user.id
             }
         }).then(function(events){
             events.length == 0 ? res.status(200).send('No Events, Please add an event') :
@@ -46,7 +46,7 @@ getAllEvents = function(req, res){
 }
 
 getOneEvent = function(req, res){
-    if(res.session.user){
+    if(req.session.user){
         return Event.findOne({
             where: {
                 id: res.params.id
@@ -71,7 +71,7 @@ updateEvent = function(req, res){
     if(!req.body || req.body.userId){
         return res.status(400).send('Do better');
     }
-    if(res.session.user){
+    if(req.session.user){
         return Event.findOne({
             where: {
                 id: res.params.id
@@ -96,7 +96,7 @@ updateEvent = function(req, res){
 }
 
 deleteEvent = function(req, res){
-    if(res.session.user){
+    if(req.session.user){
         return Event.findOne({
             where: {
                 id: req.params.id
