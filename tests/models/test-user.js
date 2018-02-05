@@ -49,7 +49,7 @@ describe("User Model Tests", function(){
         return User.create(mockUsers[0]).then((user) => {
             return User.findAll().then((results) => {
                 expect(results).to.have.lengthOf(1);
-                expect(user.id).to.equal(1);
+                expect(user.id).to.equal("001");
                 expect(user.userName).to.equal("sgaamuwa");
                 expect(user.firstName).to.equal("Samuel");
             });
@@ -60,7 +60,7 @@ describe("User Model Tests", function(){
         return User.bulkCreate(mockUsers).then((users) => {
             return User.destroy({
                 where: {
-                    id: 3
+                    id: "003"
                 }
             }).then(() => {
                 return User.findAll().then((results) => {
@@ -76,12 +76,12 @@ describe("User Model Tests", function(){
             return User.update(
                 { firstName: "Brian"},
                 { where: {
-                    id: 4
+                    id: "004"
                 }}
             ).then(() => {
                 return User.findOne({
                     where: {
-                        id: 4
+                        id: "004"
                     }
                 }).then((user) => {
                     expect(users[3].firstName).to.equal('Kimani');
@@ -97,7 +97,7 @@ describe("User Model Tests", function(){
         return User.bulkCreate(mockUsers).then(() => {
             return User.findOne({
                 where:{
-                    id: 3
+                    id: "003"
                 }
             }).then((user) => {
                 expect(user.userName).to.equal('rwachira');

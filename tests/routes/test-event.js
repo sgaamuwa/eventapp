@@ -10,11 +10,12 @@ chai.use(chaiHttp);
 
 let token;
 let authorisedUser = chai.request.agent(server);
+let unAuthorisedUser = chai.request.agent(server);
 
 describe('Event controller tests', function(){
 
     before(function(done){
-        // create a user and get a session back
+        // create the first user to test with
         chai.request(server)
             .post('/register')
             .send({
@@ -25,23 +26,45 @@ describe('Event controller tests', function(){
                 password: "pass123"
             })
             .end(function(err, res){
-                authorisedUser
-                    .post('/login')
+                // create the second user
+                chai.request(server)
+                    .post('/register')
                     .send({
-                        userName: "test",
+                        id: "6",
+                        userName: "test2",
+                        firstName: "Test FirstName",
+                        lastName: "Test LastName",
                         password: "pass123"
                     })
                     .end(function(err, res){
-                        token = res.body.token;
-                        // get cookie from response
-                        Events.destroy({ where: {} })
-                              .then(function(){
-                                  Events.bulkCreate(eventPayloads.getBulkCreate())
-                                        .then(function(){
-                                            done();
-                                        });
-                              });
-                    });
+                        // create session for the first user
+                        authorisedUser
+                            .post('/login')
+                            .send({
+                                userName: "test",
+                                password: "pass123"
+                            })
+                            .end(function(err, res){
+                                // create session for second user
+                                unAuthorisedUser
+                                    .post('/login')
+                                    .send({
+                                        userName: "test2",
+                                        password: "pass123"
+                                    })
+                                    .end(function(err, res){
+                                        token = res.body.token;
+                                        Events.destroy({ where: {} })
+                                            .then(function(){
+                                                Events.bulkCreate(eventPayloads.getBulkCreate())
+                                                        .then(function(){
+
+                                                            done();
+                                                        });
+                                            });
+                                    })
+                            });
+                    })
             });
         // add events to the database for the tests
         
@@ -62,16 +85,27 @@ describe('Event controller tests', function(){
             .set({'JWT-Token': token})
             .send(eventPayloads.getValidPostEvent())
             .end(function(err, res){
-                console.log('error>>>>',res.body);
                 expect(res).to.have.status(201);
                 done();
             });
     });
 
     it('should return an error if event body is empty', function(done){
-        chai.request(server)
-            .post('/events')
+        authorisedUser
+            .post('/api/events')
+            .set({'JWT-Token': token})
             .send({})
+            .end(function(err, res){
+                expect(res).to.have.status(400);
+                done();
+            });
+    });
+
+    it('should return an error if event body contains wrong information', function(done){
+        authorisedUser
+            .post('/api/events')
+            .set({'JWT-Token': token})
+            .send({eventMachine: "new Machine"})
             .end(function(err, res){
                 expect(res).to.have.status(400);
                 done();
@@ -80,8 +114,8 @@ describe('Event controller tests', function(){
 
     // GET tests
     it('should return all events for a given user', function(done){
-        chai.request(server)
-            .get('/events')
+        authorisedUser
+            .get('/api/events')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(200);
@@ -92,19 +126,19 @@ describe('Event controller tests', function(){
     });
 
     it('should return event when id is provided', function(done){
-        chai.request(server)
-            .get('/event/1')
+        authorisedUser
+            .get('/api/event/1')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(200);
-                expect(res.body.eventTitle).to.be("Play");
+                expect(res.body.eventTitle).to.equal("Play");
                 done();
             });
     });
 
     it('should return 404 if id provided is not available', function(done){
-        chai.request(server)
-            .get('/event/647284')
+        authorisedUser
+            .get('/api/event/647284')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(404);
@@ -114,7 +148,8 @@ describe('Event controller tests', function(){
 
     it('should return 401 Unauthorised if user is not authenticated', function(done){
         chai.request(server)
-            .get('/event/1')
+            .get('/api/event/1')
+            .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(401);
                 done();
@@ -122,8 +157,8 @@ describe('Event controller tests', function(){
     });
 
     it('should not return event if the user is different', function(done){
-        chai.request(server)
-            .get('/event/1')
+        unAuthorisedUser
+            .get('/api/event/1')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(403);
@@ -133,8 +168,8 @@ describe('Event controller tests', function(){
 
     // PATCH tests
     it('should be able to update the event', function(done){
-        chai.request(server)
-            .patch('/event/1')
+        authorisedUser
+            .patch('/api/event/1')
             .send({eventLabel: "New Label"})
             .set({'JWT-Token': token})
             .end(function(err, res){
@@ -144,8 +179,8 @@ describe('Event controller tests', function(){
     });
 
     it('should not update the event if no information is provided', function(done){
-        chai.request(server)
-            .patch('/event/1')
+        authorisedUser
+            .patch('/api/event/1')
             .send({})
             .set({'JWT-Token': token})
             .end(function(err, res){
@@ -155,8 +190,8 @@ describe('Event controller tests', function(){
     });
 
     it('should return a 400 Bad Request if wrong information is sent', function(done){
-        chai.request(server)
-            .patch('/event/1')
+        authorisedUser
+            .patch('/api/event/1')
             .send({eventMachine: "New Label"})
             .set({'JWT-Token': token})
             .end(function(err, res){
@@ -166,8 +201,8 @@ describe('Event controller tests', function(){
     });
 
     it('should not update if user is not the creator', function(done){
-        chai.request(server)
-            .patch('/event/1')
+        unAuthorisedUser
+            .patch('/api/event/1')
             .send({eventLabel: "New Label"})
             .set({'JWT-Token': token})
             .end(function(err, res){
@@ -178,7 +213,7 @@ describe('Event controller tests', function(){
 
     it('should not update if user is not authenticated', function(done){
         chai.request(server)
-            .patch('/event/1')
+            .patch('/api/event/1')
             .send({eventLabel: "New Label"})
             .set({'JWT-Token': "58923A99DJ29NIJDI3KSI3K48892JDLAO8502DI93"})
             .end(function(err, res){
@@ -189,8 +224,8 @@ describe('Event controller tests', function(){
 
     // DELETE tests
     it('should delete event if the id is right', function(done){
-        chai.request(server)
-            .del('/event/3')
+        authorisedUser
+            .del('/api/event/3')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(204);
@@ -199,8 +234,8 @@ describe('Event controller tests', function(){
     });
 
     it('should return an error if the event does not exist', function(done){
-        chai.request(server)
-            .del('/event/89174')
+        authorisedUser
+            .del('/api/event/89174')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(404);
@@ -209,8 +244,8 @@ describe('Event controller tests', function(){
     });
 
     it('should not delete if user is not the creator', function(done){
-        chai.request(server)
-            .del('/event/1')
+        unAuthorisedUser
+            .del('/api/event/1')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(403);
@@ -219,13 +254,13 @@ describe('Event controller tests', function(){
     });
 
     it('should return error if the event was deleted', function(done){
-        chai.request(server)
-            .del('/event/2')
+        authorisedUser
+            .del('/api/event/2')
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(204);
-                chai.request(server)
-                    .del('/event/2')
+                authorisedUser
+                    .del('/api/event/2')
                     .set({'JWT-Token': token})
                     .end(function(err, res){
                         expect(res).to.have.status(404);
@@ -236,8 +271,7 @@ describe('Event controller tests', function(){
 
     it('should not delete if user is not authorised', function(done){
         chai.request(server)
-            .patch('/event/1')
-            .send({eventLabel: "New Label"})
+            .del('/api/event/1')
             .set({'JWT-Token': "58923A99DJ29NIJDI3KSI3K48892JDLAO8502DI93"})
             .end(function(err, res){
                 expect(res).to.have.status(401);
