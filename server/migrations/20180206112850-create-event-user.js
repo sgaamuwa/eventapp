@@ -8,11 +8,23 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      userId: {
-        type: Sequelize.STRING
+      user_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
-      eventId: {
-        type: Sequelize.STRING
+      event_id: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'events',
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       createdAt: {
         allowNull: false,

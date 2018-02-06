@@ -51,8 +51,9 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate: function(models) {
         // associations can be defined here
-        event.belongsTo(User, {
-          foreignKey: 'userId'
+        event.belongsTo(models.User, {
+          foreignKey: 'userId',
+          onDelete: 'CASCADE',
         });
       }
     }
