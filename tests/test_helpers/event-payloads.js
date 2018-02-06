@@ -9,7 +9,8 @@ EventPayloads.prototype.getBulkCreate = function getBulkCreate(){
             location: "National Theatre",
             availableSlots: "3",
             eventDate: date(2),
-            eventLink: ""
+            eventLink: "",
+            userId: "5"
         },
         {
             id: "2",
@@ -17,7 +18,8 @@ EventPayloads.prototype.getBulkCreate = function getBulkCreate(){
             location: "Rugby Stadium",
             availableSlots: "5",
             eventDate: date(4),
-            eventLink: ""
+            eventLink: "",
+            userId: "5"
         },
         {
             id: "3",
@@ -25,7 +27,8 @@ EventPayloads.prototype.getBulkCreate = function getBulkCreate(){
             location: "The Sky",
             availableSlots: "4",
             eventDate: date(6),
-            eventLink: ""
+            eventLink: "",
+            userId: "5"
         }
     ]
 }

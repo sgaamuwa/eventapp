@@ -218,7 +218,6 @@ describe('User Controller Tests', function(){
             .set({'JWT-Token': token})
             .send({news: "test"})
             .end(function(error, response){
-                console.log('the thing >>>>>>>',response);
                 expect(response).to.have.status(400);
                 done();
             });
