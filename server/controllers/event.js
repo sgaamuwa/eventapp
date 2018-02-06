@@ -1,6 +1,7 @@
 const Event = require('../models').event;
 const User = require('../models').User;
 const _ = require('lodash');
+const uniqid = require('uniqid');
 
 let eventData = ['eventTitle', 'location', 'availableSlots', 'eventDate', 'eventLink'];
 createEvent = function(req, res){
@@ -19,6 +20,7 @@ createEvent = function(req, res){
             }
         }).then(function(user){
             if(user){
+                event.id = uniqid();
                 event.userId = user.id;
                 Event.create(event).then(function(createdEvent){
                     res.status(201).send(createdEvent);

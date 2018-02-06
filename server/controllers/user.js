@@ -2,6 +2,7 @@ const User = require('../models').User;
 const jwt = require('jsonwebtoken');
 const passwordHash = require('password-hash');
 const _ = require('lodash');
+const uniqid = require('uniqid');
 
 let userData = ['userName', 'firstName', 'lastName', 'password'];
 authenticate = function(req, res){
@@ -52,7 +53,7 @@ createUser = function(req, res){
             res.status(400).send('A user with that username already exists')
         }else{ 
             User.create({
-                id: req.body.id,
+                id: uniqid(),
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 userName: req.body.userName,

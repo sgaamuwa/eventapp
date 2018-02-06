@@ -20,7 +20,8 @@
     "password-hash": "^1.2.2",
     "pg": "^7.3.0",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^4.8.4"
+    "sequelize": "^4.8.4",
+    "uniqid": "^4.1.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",
