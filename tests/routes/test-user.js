@@ -4,6 +4,7 @@ const chaiHttp = require('chai-http');
 const server = require('../../app');
 const User = require('../../server/models').User;
 const userController = require('../../server/controllers').user;
+const userPayloads = require('../test_helpers/user-payloads');
 
 let userInput;
 let token;
@@ -13,91 +14,23 @@ chai.use(chaiHttp);
 
 describe('User Controller Tests', function(){
     before(function(done){
-        userInput = [
-            // full names
-            {
-                id: "1",
-                firstName: "Samuel",
-                lastName: "Gaamuwa",
-                userName: "sgaamuwa",
-                password: "pass123"
-            },
-            {
-                id: "2",
-                userName: "aokoth",
-                firstName: "Arnold",
-                lastName: "Okoth",
-                password: "pass123"
-            },
-            {
-                id: "3",
-                userName: "rwachira",
-                firstName: "Rehema",
-                lastName: "Wachira",
-                password: "pass123"
-            },
-            {
-                id: "4",
-                userName: "kndegwa",
-                firstName: "Kimani",
-                lastName: "Ndegwa",
-                password: "pass123"
-            },
-            // lacking certain credentials
-            {
-                userName: "",
-                firstName: "Arnold",
-                lastName: "Okoth",
-                password: "pass123"
-            },
-            {
-                userName: "aokoth",
-                firstName: "Arnold",
-                lastName: "Okoth",
-                password: ""
-            },
-            {
-                userName: "aokoth",
-                firstName: "",
-                lastName: "Okoth",
-                password: "pass123"
-            },
-            {
-                userName: "aokoth",
-                firstName: "Arnold",
-                lastName: "",
-                password: "pass123"
-            },
-        ]
+        // add users to the database
         User.destroy({ where: {} }).then(function(){
-            User.bulkCreate([userInput[0], userInput[1], userInput[2]])
+            User.bulkCreate(userPayloads.getBulkCreate())
                 .then(function(){
-                    done();
+                    // get a session for a user
+                    chai.request(server)
+                        .post('/login')
+                        .send({
+                            userName: "test",
+                            password: "pass123"
+                        })
+                        .end(function(err, res){
+                            token = res.body.token;
+                            done();
+                        });
                 });
         });
-    });
-    before(function(done){
-        chai.request(server)
-            .post('/register')
-            .send({
-                id: "5",
-                userName: "test",
-                firstName: "Test FirstName",
-                lastName: "Test LastName",
-                password: "pass123"
-            })
-            .end(function(err, res){
-                chai.request(server)
-                    .post('/login')
-                    .send({
-                        userName: "test",
-                        password: "pass123"
-                    })
-                    .end(function(err, res){
-                        token = res.body.token;
-                        done();
-                    });
-            });
     });
     after(function(done){
         User.destroy({ where: {} }).then(function(){
@@ -112,7 +45,7 @@ describe('User Controller Tests', function(){
     it('should create a user if all parameters are valid', function(done){
         chai.request(server)
             .post('/register')
-            .send(userInput[3])
+            .send(userPayloads.getValidPostUser())
             .end(function(err, res){
                 expect(res).to.have.status(201);
                 done();
@@ -122,7 +55,7 @@ describe('User Controller Tests', function(){
     it('should not create a user if the userName already exists', function(done){
         chai.request(server)
             .post('/register')
-            .send(userInput[0])
+            .send(userPayloads.getBulkCreate()[0])
             .end(function(err, res){
                 // ensure that the user has been created
                 expect(res).to.have.status(400);
@@ -130,17 +63,17 @@ describe('User Controller Tests', function(){
             });
     });
 
-    it('should return an error if user information for creation is incomplete', function(done){
-        for(counter = 4; counter < 8; counter++){
-            chai.request(server)
-                .post('/register')
-                .send(userInput[counter])
-                .end(function(err, res){
-                    expect(res).to.have.status(400);
-                });
-        }
-        done();
-    });
+    // it('should return an error if user information for creation is incomplete', function(done){
+    //     for(counter = 4; counter < 8; counter++){
+    //         chai.request(server)
+    //             .post('/register')
+    //             .send(userInput[counter])
+    //             .end(function(err, res){
+    //                 expect(res).to.have.status(400);
+    //             });
+    //     }
+    //     done();
+    // });
 
     // GET tests
     it('should get all users', function(done){
@@ -180,10 +113,10 @@ describe('User Controller Tests', function(){
         chai.request(server)
             .patch('/api/user/1')
             .set({'JWT-Token': token})
-            .send({userName : "gsamuel"})
+            .send({userName : "sgaamuwa"})
             .end(function(error, response){
                 // ensure that the same user can't be created twice
-                expect(response.body.userName).to.equal('gsamuel');
+                expect(response.body.userName).to.equal('sgaamuwa');
                 expect(response).to.have.status(200);
                 done();
             });
