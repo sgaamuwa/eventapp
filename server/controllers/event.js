@@ -1,10 +1,16 @@
 const Event = require('../models').event;
 const User = require('../models').User;
+const _ = require('lodash');
 
+let eventData = ['eventTitle', 'location', 'availableSlots', 'eventDate', 'eventLink'];
 createEvent = function(req, res){
     // check if there is a user
     if(req.session.user){
         let event = req.body;
+        // ensure that it is not empty
+        if(_.isEmpty(req.body)){
+            return res.status(400).send('The body is empty');
+        }
         // check that the user exists
         return User.findOne({
             where:{
@@ -17,7 +23,7 @@ createEvent = function(req, res){
                 Event.create(event).then(function(createdEvent){
                     res.status(201).send(createdEvent);
                 }).catch(function(error){
-                    res.status(400).send('Send more data');
+                    res.status(400).send('Wrong data was sent');
                 });
             }else{
                 res.status(400).send('User does not exist');
@@ -41,7 +47,7 @@ getAllEvents = function(req, res){
             res.status(400).send('Error error');
         });
     }else{
-        return res.status(401).send('Please login');
+        res.status(401).send('Please login');
     }
 }
 
@@ -49,7 +55,7 @@ getOneEvent = function(req, res){
     if(req.session.user){
         return Event.findOne({
             where: {
-                id: res.params.id
+                id: req.params.id
             }
         }).then(function(event){
             if(!event){
@@ -68,13 +74,19 @@ getOneEvent = function(req, res){
 
 updateEvent = function(req, res){
     // check that the body is not empty and that it does not include a user id
-    if(!req.body || req.body.userId){
-        return res.status(400).send('Do better');
+    if(_.isEmpty(req.body)){
+        return res.status(400).send('The body is empty');
+    }else{
+        _.forEach(Object.keys(req.body), function(key){
+            if(!(eventData.includes(key))){
+                return res.status(400).send('Wrong data');
+            }
+        });
     }
     if(req.session.user){
         return Event.findOne({
             where: {
-                id: res.params.id
+                id: req.params.id
             }
         }).then(function(event){
             // return a 404 if it doesn't exist
@@ -123,5 +135,9 @@ deleteEvent = function(req, res){
 }
 
 module.exports = {
-    createEvent
+    createEvent,
+    getAllEvents,
+    getOneEvent,
+    updateEvent, 
+    deleteEvent
 }
