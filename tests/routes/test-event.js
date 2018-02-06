@@ -170,8 +170,8 @@ describe('Event controller tests', function(){
     it('should be able to update the event', function(done){
         authorisedUser
             .patch('/api/event/1')
-            .send({eventLabel: "New Label"})
             .set({'JWT-Token': token})
+            .send({eventTitle: "New Label"})
             .end(function(err, res){
                 expect(res).to.have.status(200);
                 done();
@@ -203,7 +203,7 @@ describe('Event controller tests', function(){
     it('should not update if user is not the creator', function(done){
         unAuthorisedUser
             .patch('/api/event/1')
-            .send({eventLabel: "New Label"})
+            .send({eventTitle: "New Label"})
             .set({'JWT-Token': token})
             .end(function(err, res){
                 expect(res).to.have.status(403);
@@ -214,7 +214,7 @@ describe('Event controller tests', function(){
     it('should not update if user is not authenticated', function(done){
         chai.request(server)
             .patch('/api/event/1')
-            .send({eventLabel: "New Label"})
+            .send({eventTitle: "New Label"})
             .set({'JWT-Token': "58923A99DJ29NIJDI3KSI3K48892JDLAO8502DI93"})
             .end(function(err, res){
                 expect(res).to.have.status(401);

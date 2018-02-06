@@ -2,6 +2,7 @@ const Event = require('../models').event;
 const User = require('../models').User;
 const _ = require('lodash');
 
+let eventData = ['eventTitle', 'location', 'availableSlots', 'eventDate', 'eventLink'];
 createEvent = function(req, res){
     // check if there is a user
     if(req.session.user){
@@ -75,6 +76,12 @@ updateEvent = function(req, res){
     // check that the body is not empty and that it does not include a user id
     if(_.isEmpty(req.body)){
         return res.status(400).send('The body is empty');
+    }else{
+        _.forEach(Object.keys(req.body), function(key){
+            if(!(eventData.includes(key))){
+                return res.status(400).send('Wrong data');
+            }
+        });
     }
     if(req.session.user){
         return Event.findOne({

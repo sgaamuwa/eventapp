@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const passwordHash = require('password-hash');
 const _ = require('lodash');
 
+let userData = ['userName', 'firstName', 'lastName', 'password'];
 authenticate = function(req, res){
     // look for the user in the database
     return User.findOne({
@@ -49,7 +50,7 @@ createUser = function(req, res){
             return res.status(400).send('need more');
         }else if(users.length > 0){
             res.status(400).send('A user with that username already exists')
-        }else{
+        }else{ 
             User.create({
                 id: req.body.id,
                 firstName: req.body.firstName,
@@ -88,6 +89,10 @@ updateUser = function(req, res){
         if(_.isEmpty(req.body)){
             return res.status(400).send('need more');
         }
+        _.forEach(Object.keys(req.body), function(key){
+            if(!(userData.includes(key)))
+                return res.status(400).send('Wrong data');
+        });
         user.update(req.body).then(function(updatedUser){
             res.status(200).send(updatedUser);
         }).catch(function(err){
