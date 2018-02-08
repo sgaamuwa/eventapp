@@ -35,7 +35,6 @@ EventPayloads.prototype.getBulkCreate = function getBulkCreate(){
 
 EventPayloads.prototype.getValidPostEvent = function getValidPostEvent(){
     return {
-        id: "4",
         eventTitle: "Pizza",
         location: "Dominos",
         availableSlots: "5",

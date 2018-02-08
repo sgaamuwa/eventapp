@@ -3,8 +3,10 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../app');
 const Events = require('../../server/models').event;
+const User = require('../../server/models').User;
 const eventController = require('../../server/controllers').event;
 const eventPayloads = require('../test_helpers/event-payloads');
+const userPayloads = require('../test_helpers/user-payloads');
 
 chai.use(chaiHttp);
 
@@ -16,59 +18,43 @@ describe('Event controller tests', function(){
 
     before(function(done){
         // create the first user to test with
-        chai.request(server)
-            .post('/register')
-            .send({
-                id: "5",
-                userName: "test",
-                firstName: "Test FirstName",
-                lastName: "Test LastName",
-                password: "pass123"
-            })
-            .end(function(err, res){
-                // create the second user
-                chai.request(server)
-                    .post('/register')
-                    .send({
-                        id: "6",
-                        userName: "test2",
-                        firstName: "Test FirstName",
-                        lastName: "Test LastName",
-                        password: "pass123"
-                    })
-                    .end(function(err, res){
-                        // create session for the first user
-                        authorisedUser
-                            .post('/login')
-                            .send({
-                                userName: "test",
-                                password: "pass123"
-                            })
-                            .end(function(err, res){
-                                // create session for second user
-                                unAuthorisedUser
-                                    .post('/login')
-                                    .send({
-                                        userName: "test2",
-                                        password: "pass123"
-                                    })
-                                    .end(function(err, res){
-                                        token = res.body.token;
-                                        Events.destroy({ where: {} })
-                                            .then(function(){
-                                                Events.bulkCreate(eventPayloads.getBulkCreate())
-                                                        .then(function(){
-
-                                                            done();
-                                                        });
-                                            });
-                                    })
-                            });
-                    })
-            });
-        // add events to the database for the tests
-        
-    });
+		User.destroy({ where: {} })
+			.then(function(){
+				User.bulkCreate(userPayloads.getBulkCreate())
+					.then(function(){
+						// get a session for a user
+						authorisedUser
+							.post('/login')
+							.send({
+								userName: "test",
+								password: "pass123"
+							})
+							.end(function(err, res){
+								token = res.body.token;
+								// get session for unauthorised user
+								unAuthorisedUser
+									.post('/login')
+									.send({
+										userName: "aokoth",
+										password: "pass123"
+									})
+									.end(function(err, res){
+										// add events to the database
+										Events
+											.destroy({ where: {} })
+											.then(function(){
+												Events
+													.bulkCreate(eventPayloads.getBulkCreate())
+													.then(function(){
+														done();
+													});
+										});
+									});
+							});
+					});
+			});
+                                        
+      })
 
     after(function(done){
         Events.destroy({
@@ -85,7 +71,8 @@ describe('Event controller tests', function(){
             .set({'JWT-Token': token})
             .send(eventPayloads.getValidPostEvent())
             .end(function(err, res){
-                expect(res).to.have.status(201);
+				expect(res).to.have.status(201);
+				console.log(res.body);
                 done();
             });
     });
