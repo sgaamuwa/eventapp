@@ -114,6 +114,50 @@ getUserEvents = function (req, res) {
 	}
 }
 
+removeParticipant = function(req, res){
+	if(req.session.user){
+		return User.findAll({
+			where: {
+				id: req.params.id
+			}
+		}).then(function(user){
+			if(_.isEmpty(user)){
+				res.status(404).send('User does not exist');
+			}else if(req.params.id != req.session.user.id){
+				res.status(403).send('You do not have permission for this');
+			}else{
+				Event.findAll({
+					where: {
+						userId: req.params.id
+					}
+				}).then(function (events) {
+					if (_.isEmpty(events)) {
+						res.status(404).send('No such event');
+					} else {
+						EventUser.findOne({
+							where: {
+								userId: req.params.userId,
+								eventId: req.params.id
+							}
+						}).then(function(participant){
+							if(_.isEmpty(participant)){
+								res.status(404).send('User not attached to event');
+							}else{
+								participant.destroy();
+								res.status(204).send();
+							}
+						}).catch(function(error){
+							res.status(500).send('error error');
+						});
+					}
+				})
+			}
+		})
+	}else{
+		return res.status(401).send('Please login');
+	}
+}
+
 mapIdToUser = function (eventParticipants) {
 	let mappedParticipants = [];
 	return new Promise(function (resolve, reject) {
