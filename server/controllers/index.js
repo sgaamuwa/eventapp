@@ -4,8 +4,8 @@ const eventParticipant = require('./event-user');
 const middleware = require('./middleware');
 
 module.exports = {
-    middleware,
-    event,
-    user,
-    eventParticipant,
+	middleware,
+	event,
+	user,
+	eventParticipant,
 }

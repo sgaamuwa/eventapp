@@ -5,122 +5,122 @@ const _ = require('lodash');
 const uniqid = require('uniqid');
 
 let userData = ['userName', 'firstName', 'lastName', 'password'];
-authenticate = function(req, res){
-    // look for the user in the database
-    return User.findOne({
-        where: {
-            userName: req.body.userName
-        }
-    }).then(function(user){
-        if(user){
-            // verify that the password matches the hashed password in the database
-            if(passwordHash.verify(req.body.password, user.password)){
-                let token = jwt.sign({data: user}, 'kinggaamuwasamuel', {
-                    expiresIn: 1440
-                });
-                req.session.user = user;
-                req.session.token = token;
-                res.status(200).json({
-                    success: true,
-                    message: 'JWT Token',
-                    token: token
-                });
-            }
-            else{
-                // send a 400 if the password does not match
-                res.status(400).send('Invalid password, authentication failed');
-            }
-        }else{
-            // send a 400 if the user is not in the database
-            res.status(400).send('User not found, authentication failed');
-        }
-    }).catch(function(err){
-        // send a 500 if there is a system error
-        res.status(500).send(err);
-    });
+authenticate = function (req, res) {
+	// look for the user in the database
+	return User.findOne({
+		where: {
+			userName: req.body.userName
+		}
+	}).then(function (user) {
+		if (user) {
+			// verify that the password matches the hashed password in the database
+			if (passwordHash.verify(req.body.password, user.password)) {
+				let token = jwt.sign({ data: user }, 'kinggaamuwasamuel', {
+					expiresIn: 1440
+				});
+				req.session.user = user;
+				req.session.token = token;
+				res.status(200).json({
+					success: true,
+					message: 'JWT Token',
+					token: token
+				});
+			}
+			else {
+				// send a 400 if the password does not match
+				res.status(400).send('Invalid password, authentication failed');
+			}
+		} else {
+			// send a 400 if the user is not in the database
+			res.status(400).send('User not found, authentication failed');
+		}
+	}).catch(function (err) {
+		// send a 500 if there is a system error
+		res.status(500).send(err);
+	});
 };
 
-createUser = function(req, res){
-    // check that no other user with that username exists and then set up that user
-    return User.findAll({
-        where: {
-            userName: req.body.userName
-        }
-    }).then((users) => {
-        if(_.isEmpty(req.body)){
-            return res.status(400).send('need more');
-        }else if(users.length > 0){
-            res.status(400).send('A user with that username already exists')
-        }else{ 
-            User.create({
-                id: uniqid(),
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                userName: req.body.userName,
-                //hash the password
-                password: passwordHash.generate(req.body.password)
-            }).then(user => res.status(201).send(user))
-            .catch(error => res.status(400).send({error}));
-        }
-    }) 
+createUser = function (req, res) {
+	// check that no other user with that username exists and then set up that user
+	return User.findAll({
+		where: {
+			userName: req.body.userName
+		}
+	}).then((users) => {
+		if (_.isEmpty(req.body)) {
+			return res.status(400).send('need more');
+		} else if (users.length > 0) {
+			res.status(400).send('A user with that username already exists')
+		} else {
+			User.create({
+				id: uniqid(),
+				firstName: req.body.firstName,
+				lastName: req.body.lastName,
+				userName: req.body.userName,
+				//hash the password
+				password: passwordHash.generate(req.body.password)
+			}).then(user => res.status(201).send(user))
+				.catch(error => res.status(400).send({ error }));
+		}
+	})
 };
 
-getUser = function(req, res){
-    return User.findOne({
-        where: {
-            id: req.params.id
-        }
-    }).then((user) => {
-        user ? res.status(200).send(user) : res.status(404).send('Resource not available');
-    }).catch(error => res.status(404).send(error));
+getUser = function (req, res) {
+	return User.findOne({
+		where: {
+			id: req.params.id
+		}
+	}).then((user) => {
+		user ? res.status(200).send(user) : res.status(404).send('Resource not available');
+	}).catch(error => res.status(404).send(error));
 };
 
-getUsers = function(req, res){
-    return User.findAll().then(function(users){
-        res.status(200).send(users);
-    });
+getUsers = function (req, res) {
+	return User.findAll().then(function (users) {
+		res.status(200).send(users);
+	});
 }
 
-updateUser = function(req, res){
-    return User.findOne({
-        where: {
-            id: req.params.id
-        }
-    }).then(function(user){
-        if(_.isEmpty(req.body)){
-            return res.status(400).send('need more');
-        }
-        _.forEach(Object.keys(req.body), function(key){
-            if(!(userData.includes(key)))
-                return res.status(400).send('Wrong data');
-        });
-        user.update(req.body).then(function(updatedUser){
-            res.status(200).send(updatedUser);
-        }).catch(function(err){
-            res.status(400).send('Bad request');
-        });
-    }).catch(function(err){
-        res.status(404).send('Do better');
-    });
+updateUser = function (req, res) {
+	return User.findOne({
+		where: {
+			id: req.params.id
+		}
+	}).then(function (user) {
+		if (_.isEmpty(req.body)) {
+			return res.status(400).send('need more');
+		}
+		_.forEach(Object.keys(req.body), function (key) {
+			if (!(userData.includes(key)))
+				return res.status(400).send('Wrong data');
+		});
+		user.update(req.body).then(function (updatedUser) {
+			res.status(200).send(updatedUser);
+		}).catch(function (err) {
+			res.status(400).send('Bad request');
+		});
+	}).catch(function (err) {
+		res.status(404).send('Do better');
+	});
 };
 
-deleteUser = function(req, res){
-    return User.destroy({
-        where: {
-            id: req.params.id
-        }
-    }).then(function(user){
-        user ? res.status(204).send('User deleted') : res.status(404).send('Resource does not exist');
-    }).catch(function(err){
-        res.status(400).send('Bad Request');
-    });
+deleteUser = function (req, res) {
+	return User.destroy({
+		where: {
+			id: req.params.id
+		}
+	}).then(function (user) {
+		user ? res.status(204).send('User deleted') : res.status(404).send('Resource does not exist');
+	}).catch(function (err) {
+		res.status(400).send('Bad Request');
+	});
 }
 
 module.exports = {
-    authenticate,
-    updateUser,
-    createUser,
-    deleteUser,
-    getUsers,
-    getUser,
+	authenticate,
+	updateUser,
+	createUser,
+	deleteUser,
+	getUsers,
+	getUser,
 }
