@@ -24,7 +24,7 @@ describe('Event controller tests', function () {
 					.then(function () {
 						// get a session for a user
 						authorisedUser
-							.post('/login')
+							.post('/session')
 							.send({
 								userName: "test",
 								password: "pass123"
@@ -33,7 +33,7 @@ describe('Event controller tests', function () {
 								token = res.body.token;
 								// get session for unauthorised user
 								unAuthorisedUser
-									.post('/login')
+									.post('/session')
 									.send({
 										userName: "aokoth",
 										password: "pass123"

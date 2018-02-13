@@ -7,7 +7,7 @@ module.exports = (app) => {
 		message: 'Approach and behold greatness'
 	}));
 	// user routes
-	app.post('/login', userController.authenticate);
+	app.post('/session', userController.authenticate);
 	app.post('/register', userController.createUser);
 	app.get('/api/users', userController.getUsers);
 	app.get('/api/user/:id', userController.getUser);

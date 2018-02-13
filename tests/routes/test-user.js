@@ -11,6 +11,7 @@ let token;
 let request = {};
 
 chai.use(chaiHttp);
+let authorisedUser = chai.request.agent(server);
 
 describe('User Controller Tests', function () {
 	before(function (done) {
@@ -19,8 +20,8 @@ describe('User Controller Tests', function () {
 			User.bulkCreate(userPayloads.getBulkCreate())
 				.then(function () {
 					// get a session for a user
-					chai.request(server)
-						.post('/login')
+					authorisedUser
+						.post('/session')
 						.send({
 							userName: "test",
 							password: "pass123"
@@ -77,7 +78,7 @@ describe('User Controller Tests', function () {
 
 	// GET tests
 	it('should get all users', function (done) {
-		chai.request(server)
+		authorisedUser
 			.get('/api/users')
 			.set({ 'JWT-Token': token })
 			.end(function (err, res) {
@@ -88,7 +89,7 @@ describe('User Controller Tests', function () {
 	})
 
 	it('should get a user if the right id is provided', function (done) {
-		chai.request(server)
+		authorisedUser
 			.get('/api/user/3')
 			.set({ 'JWT-Token': token })
 			.end(function (error, response) {
@@ -99,7 +100,7 @@ describe('User Controller Tests', function () {
 	});
 
 	it('should raise an error if the user is not available', function (done) {
-		chai.request(server)
+		authorisedUser
 			.get('/api/user/20002')
 			.set({ 'JWT-Token': token })
 			.end(function (error, response) {
@@ -110,7 +111,7 @@ describe('User Controller Tests', function () {
 
 	// PATCH tests
 	it('should update a user if they exist', function (done) {
-		chai.request(server)
+		authorisedUser
 			.patch('/api/user/1')
 			.set({ 'JWT-Token': token })
 			.send({ userName: "sgaamuwa" })
@@ -123,7 +124,7 @@ describe('User Controller Tests', function () {
 	});
 
 	it('should not update if there is no information passed', function (done) {
-		chai.request(server)
+		authorisedUser
 			.patch('/api/user/5')
 			.set({ 'JWT-Token': token })
 			.send({})
@@ -135,7 +136,7 @@ describe('User Controller Tests', function () {
 	});
 
 	it('should not update if the user does not exist', function (done) {
-		chai.request(server)
+		authorisedUser
 			.patch('/api/user/2345323')
 			.set({ 'JWT-Token': token })
 			.send({ userName: "gsamuel" })
@@ -146,7 +147,7 @@ describe('User Controller Tests', function () {
 	});
 
 	it('should raise an error if the update information is wrong', function (done) {
-		chai.request(server)
+		authorisedUser
 			.patch('/api/user/5')
 			.set({ 'JWT-Token': token })
 			.send({ news: "test" })
@@ -158,7 +159,7 @@ describe('User Controller Tests', function () {
 
 	// DELETE tests
 	it('should delete a user if they exist', function (done) {
-		chai.request(server)
+		authorisedUser
 			.del('/api/user/2')
 			.set({ 'JWT-Token': token })
 			.end(function (error, response) {
@@ -169,13 +170,13 @@ describe('User Controller Tests', function () {
 	});
 
 	it('should return error if the user was deleted', function (done) {
-		chai.request(server)
+		authorisedUser
 			.del('/api/user/3')
 			.set({ 'JWT-Token': token })
 			.end(function (error, response) {
 				// ensure that the same user can't be created twice
 				expect(response).to.have.status(204);
-				chai.request(server)
+				authorisedUser
 					.del('/api/user/3')
 					.set({ 'JWT-Token': token })
 					.end(function (error, response) {
@@ -187,7 +188,7 @@ describe('User Controller Tests', function () {
 	});
 
 	it('should return error if deleted user does not exist', function (done) {
-		chai.request(server)
+		authorisedUser
 			.del('/api/user/2345323')
 			.set({ 'JWT-Token': token })
 			.end(function (error, response) {

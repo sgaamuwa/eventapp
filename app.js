@@ -3,6 +3,7 @@ const session = require('express-session');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const apiRoutes = require('./server/controllers').middleware.apiRoutes;
+const sessionUserCheck = require('./server/controllers').middleware.sessionUserCheck;
 
 // Set up the express app
 const app = express();
@@ -23,6 +24,8 @@ app.use(session({
     expires: 100000000
   }
 }));
+
+app.use('/api', sessionUserCheck);
 
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(bodyParser.json());

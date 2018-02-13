@@ -1,5 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const User = require('../models').User
+const _ = require('lodash');
 
 let apiRoutes = express.Router();
 
@@ -26,6 +28,28 @@ apiRoutes.use(function (req, res, next) {
 	}
 });
 
+sessionUserCheck = function(req, res, next){
+	if(req.session && req.session.user){
+		User.findAll({
+			where: {
+				id: req.session.user.id
+			}
+		}).then(function(user){
+			if(_.isEmpty(user)){
+				req.session.reset();
+				res.status(401).send('Please login');
+			}else{
+				next();
+			}
+		}).catch(function(error){
+			res.status(500).send('error error');
+		});
+	}else{
+		return res.status(401).send('Please login');
+	}
+}
+
 module.exports = {
-	apiRoutes
+	apiRoutes,
+	sessionUserCheck
 }
